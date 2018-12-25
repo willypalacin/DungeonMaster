@@ -1,0 +1,91 @@
+body{
+  background-image: url(/media/images/dungeon_step.png);
+}
+h1{
+  text-align:center;
+  color:black;
+  font-size: 3em;
+  font-display: "Arial";
+}
+
+h2{
+  text-align:center;
+  color:white;
+  font-size: 2em;
+  font-display: "Arial";
+}
+
+h3{
+  color: white;
+  font-size: em;
+  font-display: "Arial";
+}
+
+.flex_top{
+  display: flex;
+  flex-direction: row;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+
+.button_com_guardar {
+  background-color: #DB7093;
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: space-between;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin: 30px 65px;
+  border-radius: 8px;
+
+
+}
+.controles{
+  justify-content: center;
+  background-color:whitesmoke;
+}
+.grid_flechas{
+  display: grid;
+  grid-gap:25px;
+  grid-template-columns: 50px 50px 50px;
+  
+  justify-content: center;
+}
+
+
+.flex_bottom{
+  display: flex;
+  flex-direction: row;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+.flex_esq{
+  display: flex;
+  flex-direction: column;
+  flex-flow: column wrap;
+  justify-content: space-around;
+}
+
+
+
+.navegacion {
+  grid-area: navegacion;
+  background-color: #DB7093;
+  float:left;
+}
+
+.equipocarac {
+  grid-area: equipo;
+  background-color: #DB7093;
+  float:left;
+}
+.mapa{
+  grid-area: mapa;
+  background-color: #DB7093;
+  float:left;
+
+
+}
