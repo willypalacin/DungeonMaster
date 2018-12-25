@@ -87,5 +87,13 @@ h3{
   background-color: #DB7093;
   float:left;
 
+}
+
+#mapacanvas {
+
+  display: flex;
+  flex-wrap: wrap;
+  height: 290px;
+  width: 290px;
 
 }

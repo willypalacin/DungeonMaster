@@ -11,6 +11,7 @@ var objetos = {
   llave: {}
 };
 
+
 var enemigo = {
   vida:0,
   ataque:0,
