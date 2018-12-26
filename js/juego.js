@@ -32,8 +32,8 @@ var player = {
   manoizquierda:"",
   mochila:[],
   estadoPartida: {
-    x:3,
-    y:1,
+    x:0,
+    y:9,
     nivel:-2,
     direccion:0, /* 0 Norte, 1 Sud, 2 Este, 3 Oeste*/
   }
