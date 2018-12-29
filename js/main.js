@@ -4,7 +4,6 @@ function casillaMapa(x, y) {
   this.y = y;
   this.id = ""+x+""+y;
   this.oscuridad = false;
-
 }
 
 /* Inicializar el juego */
@@ -15,12 +14,70 @@ function iniciarJuego() {
 
 function comenzarPartida() {
   inicializarMiniMapa();
+  pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
 
 }
+/*Guille: Función que verifica, que se haya pulsado el teclado*/
+function arrow_clicked(boton) {
+  switch(boton) {
+    case 'up':
+      console.log("Arriba");
+      break;
+    case 'down':
+      console.log("Down");
+      break;
+    case 'right':
+      console.log("Derecha");
+      break;
+    case 'left':
+      console.log("left");
+      break;
+    case 'rot_left':
+      console.log("Rotamos_IZQ");
+      break;
+    case 'rot_right':
+      console.log("Rotamos_RIGHT");
+      break;
+
+  }
+  pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+  
+
+}
+/*Guille: Funcion que en base a una coordenada encuentra la casilla asociada */
+function localizarCasilla(x, y) {
+  for(var i = 0; i<mapa.length;i++) {
+    if(mapa[i].id == ""+x+""+y) {
+      var cas = mapa[i];
+    }
+  }
+  return cas;
+} 
 
 /* Convierte lo que hay en el mapa en un archivo de imagen */
 function mapaToImg(x, y) {
-  /* TODO */
+  switch(player.estadoPartida.direccion) {
+    case 0: /*norte*/
+      if(y == 0) {
+       return "dungeon_wall.png" ;
+      }
+      break;
+    case 1: /*sur*/
+      if(y == 9) {
+       return "dungeon_wall.png";
+      }
+      break;  
+    case 2: /*este*/
+      if(x == 9) {
+        return "dungeon_wall.png";
+      }
+      break;
+    case 3: /*oeste*/
+      if(x == 0) {
+        return "dungeon_wall.png";
+      }
+      break;
+  }
 }
 /*Guille: Método que se encarga de pintar minimapa*/
 function inicializarMiniMapa() {
