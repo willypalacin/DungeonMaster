@@ -23,38 +23,44 @@ function pintarCasillaActual() {
 function comenzarPartida() {
   inicializarMiniMapa();
   pintarCasillaActual();
+  eliminarCasillaActual();
   pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
   
 }
 /*Guille: Función que verifica, que se haya pulsado el teclado*/
 function arrow_clicked(boton) {
+  eliminarCasillaActual();
   var direcc = player.estadoPartida.direccion;
   if(boton == 'up' && direcc == 0 && player.estadoPartida.y != 0) {
-    player.estadoPartida.y--;
+    if(localizarCasilla(player.estadoPartida.x, player.estadoPartida.y-1).oscuridad == false) player.estadoPartida.y--;
   }
-    else if (boton == 'down' && direcc == 1 && player.estadoPartida.y != 9)
-     player.estadoPartida.y++;
-    else if (boton == 'right' && direcc == 2 && player.estadoPartida.x != 9)
-      player.estadoPartida.x++;
-    else if (boton == 'left' && direcc == 3 && player.estadoPartida.x != 0)
-     player.estadoPartida.x++;
-  
-  if(boton == 'rot_right') player.estadoPartida.direccion = (player.estadoPartida.direccion + 1)%4;
-  else {
-    if(player.estadoPartida.direccion == 0) {
-      player.estadoPartida.direccion = 4;
+    else if (boton == 'down' && direcc == 2 && player.estadoPartida.y != 9) {
+      if(!localizarCasilla(player.estadoPartida.x,player.estadoPartida.y+1).oscuridad) player.estadoPartida.y++;
     }
-    player.estadoPartida.direccion = (player.estadoPartida.direccion - 1) % 4;
+    else if (boton == 'right' && direcc == 1 && player.estadoPartida.x != 9) {
+      if(!localizarCasilla(player.estadoPartida.x+1,player.estadoPartida.y).oscuridad) player.estadoPartida.x++;
+    }
+    else if (boton == 'left' && direcc == 3 && player.estadoPartida.x != 0) {
+     if(!localizarCasilla(player.estadoPartida.x-1,player.estadoPartida.y).oscuridad) player.estadoPartida.x--;
+    }
+    else if(boton == 'rot_right') {
+      player.estadoPartida.direccion = (player.estadoPartida.direccion + 1)%4;}
+    else if(boton == 'rot_left') {
+      if(player.estadoPartida.direccion == 0)  player.estadoPartida.direccion = 4;
+      player.estadoPartida.direccion = (player.estadoPartida.direccion - 1) % 4;
+    
+    }
   
-  }
+  
   
   console.log("Direccion Partida   " + player.estadoPartida.direccion);
+  console.log("POS_X: " + player.estadoPartida.x + "POS_Y: " + player.estadoPartida.y);
   pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
   
 
 }
 /*Guille: Funcion que en base a una coordenada encuentra la casilla asociada */
-function localizarCasilla(x, y) {
+function localizarCasilla(y, x) {
   for(var i = 0; i<mapa.length;i++) {
     if(mapa[i].id == ""+x+""+y) {
       var cas = mapa[i];
@@ -62,27 +68,33 @@ function localizarCasilla(x, y) {
   }
   return cas;
 } 
+/*Funcionq ue se encarga de eliminar la imagen de la casilla de la posicion actual*/
+function eliminarCasillaActual() {
+  var cas = document.getElementById("casilla" + player.estadoPartida.y + player.estadoPartida.x);
+  cas.removeChild(cas.firstChild);
+  console.log("Eliminado");
+
+}
 
 /* Convierte lo que hay en el mapa en un archivo de imagen */
 function mapaToImg(x, y) {
-
+  
   /*Actualizamos la posición de la casilla actual*/
-  var cas = document.getElementById("casilla" +player.estadoPartida.y + player.estadoPartida.x);
-  cas.removeChild(cas.firstChild);
   var imgActual = document.createElement("img");
   imgActual.setAttribute("src","./media/images/flecha" + player.estadoPartida.direccion+".png");
   imgActual.id = "posActual";
-  document.getElementById("casilla" +player.estadoPartida.y + player.estadoPartida.x).appendChild(imgActual);
+  document.getElementById("casilla" + player.estadoPartida.y + player.estadoPartida.x).appendChild(imgActual);
 
   /*Según el estado de la direción  */
   switch(player.estadoPartida.direccion) {
     case 0: /*norte*/
-    if(x == 9 && y == 1) return "dungeon_door.png"; /*Si estamos delante dela puerta*/ 
+    console.log("case 0: ");
+    if(x == 9 && y == 1) return "dungeon_door.png"; /*Si estamos delante de la puerta*/ 
       else {
         if(y == 0) {
           return "dungeon_wall.png" ;
         } else {
-           if(localizarCasilla(x,y-1).oscuridad) return "dungeon_wall.png";
+           if(localizarCasilla(x,y-1).oscuridad) {return "dungeon_wall.png";}
             else return "dungeon_step.png";
       }
     }
@@ -153,7 +165,7 @@ function inicializarMiniMapa() {
   
   for(var j = 0; j < mapa.length; j++) {
     if(mapa[j].oscuridad)
-    console.log(mapa[j].id)
+      console.log(mapa[j].id)
   }
  
   
