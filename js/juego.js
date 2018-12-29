@@ -35,7 +35,7 @@ var player = {
     x:0,
     y:9,
     nivel:-2,
-    direccion:1, /* 0 Norte, 1 Sud, 2 Este, 3 Oeste*/
+    direccion:1, /* 0 Norte, 1 Este, 2 Sur, 3 Oeste*/
   }
 };
 

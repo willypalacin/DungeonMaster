@@ -9,37 +9,46 @@ function casillaMapa(x, y) {
 /* Inicializar el juego */
 function iniciarJuego() {
   /* TODO */
+  //Deberiamos cargar ficheros. 
   
+}
+
+function pintarCasillaActual() {
+  var imgPosActual = document.createElement("img");
+  imgPosActual.setAttribute("src","./media/images/flecha" + player.estadoPartida.direccion+".png");
+  imgPosActual.id = "posActual";
+  document.getElementById("casilla" +player.estadoPartida.y + player.estadoPartida.x).appendChild(imgPosActual);
 }
 
 function comenzarPartida() {
   inicializarMiniMapa();
+  pintarCasillaActual();
   pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
-
+  
 }
 /*Guille: Función que verifica, que se haya pulsado el teclado*/
 function arrow_clicked(boton) {
-  switch(boton) {
-    case 'up':
-      console.log("Arriba");
-      break;
-    case 'down':
-      console.log("Down");
-      break;
-    case 'right':
-      console.log("Derecha");
-      break;
-    case 'left':
-      console.log("left");
-      break;
-    case 'rot_left':
-      console.log("Rotamos_IZQ");
-      break;
-    case 'rot_right':
-      console.log("Rotamos_RIGHT");
-      break;
-
+  var direcc = player.estadoPartida.direccion;
+  if(boton == 'up' && direcc == 0 && player.estadoPartida.y != 0) {
+    player.estadoPartida.y--;
   }
+    else if (boton == 'down' && direcc == 1 && player.estadoPartida.y != 9)
+     player.estadoPartida.y++;
+    else if (boton == 'right' && direcc == 2 && player.estadoPartida.x != 9)
+      player.estadoPartida.x++;
+    else if (boton == 'left' && direcc == 3 && player.estadoPartida.x != 0)
+     player.estadoPartida.x++;
+  
+  if(boton == 'rot_right') player.estadoPartida.direccion = (player.estadoPartida.direccion + 1)%4;
+  else {
+    if(player.estadoPartida.direccion == 0) {
+      player.estadoPartida.direccion = 4;
+    }
+    player.estadoPartida.direccion = (player.estadoPartida.direccion - 1) % 4;
+  
+  }
+  
+  console.log("Direccion Partida   " + player.estadoPartida.direccion);
   pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
   
 
@@ -56,27 +65,56 @@ function localizarCasilla(x, y) {
 
 /* Convierte lo que hay en el mapa en un archivo de imagen */
 function mapaToImg(x, y) {
+
+  /*Actualizamos la posición de la casilla actual*/
+  var cas = document.getElementById("casilla" +player.estadoPartida.y + player.estadoPartida.x);
+  cas.removeChild(cas.firstChild);
+  var imgActual = document.createElement("img");
+  imgActual.setAttribute("src","./media/images/flecha" + player.estadoPartida.direccion+".png");
+  imgActual.id = "posActual";
+  document.getElementById("casilla" +player.estadoPartida.y + player.estadoPartida.x).appendChild(imgActual);
+
+  /*Según el estado de la direción  */
   switch(player.estadoPartida.direccion) {
     case 0: /*norte*/
-      if(y == 0) {
-       return "dungeon_wall.png" ;
+    if(x == 9 && y == 1) return "dungeon_door.png"; /*Si estamos delante dela puerta*/ 
+      else {
+        if(y == 0) {
+          return "dungeon_wall.png" ;
+        } else {
+           if(localizarCasilla(x,y-1).oscuridad) return "dungeon_wall.png";
+            else return "dungeon_step.png";
       }
+    }
       break;
-    case 1: /*sur*/
+    case 2: /*sur*/
       if(y == 9) {
        return "dungeon_wall.png";
-      }
+      } else {
+        if(localizarCasilla(x,y+1).oscuridad) return "dungeon_wall.png";
+        else return "dungeon_step.png";
+       }
       break;  
-    case 2: /*este*/
+    case 1: /*este*/
+     if(x == 8 && y == 0) return "dungeon_door.png"; /*Si estamos delante dela puerta*/
       if(x == 9) {
         return "dungeon_wall.png";
       }
+      else {
+        if(localizarCasilla(x+1,y).oscuridad) return "dungeon_wall.png";
+        else return "dungeon_step.png";
+       }
+       /* En caso de que hayamos encontrado la puerta */
       break;
     case 3: /*oeste*/
       if(x == 0) {
         return "dungeon_wall.png";
       }
-      break;
+      else {
+        if(localizarCasilla(x-1,y).oscuridad) return "dungeon_wall.png";
+        else return "dungeon_step.png";
+       }
+      break;   
   }
 }
 /*Guille: Método que se encarga de pintar minimapa*/
@@ -101,17 +139,17 @@ function inicializarMiniMapa() {
     }
   }
 
-  pintarMinimapa("00","80","columna");
-  pintarMinimapa("00","05","fila");
-  pintarMinimapa("19","99","columna");
-  pintarMinimapa("58","98","columna");
-  pintarMinimapa("95","99","fila");
-  pintarMinimapa("35","37","fila");
-  pintarMinimapa("05","65","columna");
-  pintarMinimapa("55","56","fila");
-  pintarMinimapa("40","43","fila");
-  pintarMinimapa("33","53","columna");
-  pintarMinimapa("70","72","fila");
+  pintarMinimapa("00","80","columna",0);
+  pintarMinimapa("00","05","fila",0);
+  pintarMinimapa("19","99","columna",0);
+  pintarMinimapa("58","98","columna",0);
+  pintarMinimapa("95","99","fila",0);
+  pintarMinimapa("35","37","fila",0);
+  pintarMinimapa("05","65","columna",0);
+  pintarMinimapa("55","56","fila",0);
+  pintarMinimapa("40","43","fila",0);
+  pintarMinimapa("33","53","columna",0);
+  pintarMinimapa("70","72","fila",0);
   
   for(var j = 0; j < mapa.length; j++) {
     if(mapa[j].oscuridad)
@@ -122,7 +160,7 @@ function inicializarMiniMapa() {
 }
 /* Guille: Método que se encarga de barrer tanto filas como columnas y pintar la oscuridad*/
 /* tipo: fila o columna */ 
-function pintarMinimapa(inicio, fin, tipo) {
+function pintarMinimapa(inicio, fin, tipo, actual) {
   if(tipo == "columna") {
     for (var i = inicio.charAt(0); i <= fin.charAt(0); i++) {
       /*Lo guardamos en el modelo de datos*/
@@ -145,5 +183,6 @@ function pintarMinimapa(inicio, fin, tipo) {
     }
 
   }
+  
 
 }
