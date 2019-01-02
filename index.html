@@ -8,15 +8,15 @@
     <meta name="blanca.marin & guillermo.palacin" content="Blanca & Guille" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/main.css" type="text/css" media="all" />
-    <script src="js/juego.js"></script>
-    <script src="js/main.js"></script>
+   
+    
   </head>
   <body>
     <header><h1>Dungeon Master AJAX Game</h1></header>
     <section class="flex_top">
       
       <button type="button" onclick = "comenzarPartida()"class="button_com_guardar">Comenzar Partida</button>
-      <button type="button" class="button_com_guardar">Guardar Partida</button>
+      <button type="button" onclick = "guardarPartida()" class="button_com_guardar">Guardar Partida</button>
      
     
   </section>
@@ -44,8 +44,80 @@
 
     <section id="navegacion" class="navegacion">
         <h2>Navegación</h2>
-        <canvas id="visor" width="512" height="512"></canvas>
-      </section>
+        <canvas id="visor" onclick = "clickVisor()"class="visor" width="512" height="512"></canvas>
+    </section>
+
+
+
+    <!--popup de objetos-->
+        <div id="myModal" class="modal">
+          <div class="modal-obj">
+            <span class="close">&times;</span><!--añado cruz para cerrar popup-->
+            <h4>YOUR OBJECTS</h4>
+            <div class="mochila_obj">
+                <img src="media/images/obj1.png"  height="65" width="65" id="obj1n2" onclick="object_clicked(1);">
+                <img src="media/images/obj2_opt.png"  height="65" width="65" id="obj2n2" onclick="object_clicked(2);">
+            </div>
+            <div>
+              <button type="button" onclick = "CogerObjMano(1)"class="button_coger">COGER CON MANO DERECHA</button>
+              <button type="button" onclick = "CogerObjMano(2)"class="button_coger">COGER CON MANO IZQUIERDA</button>
+
+            </div>
+            <div>
+              <h4>MANO DERECHA</h4>
+              <img src="media/images/obj1.png"  height="40" width="40" id="cogido_derecha_1">
+              <img src="media/images/obj2_opt.png"  height="40" width="40" id="cogido_derecha_2">
+            </div>
+            <div>
+              <h4>MANO IZQUIERDA</h4>
+              <img src="media/images/obj1.png"  height="40" width="40" id="cogido_izq_1">
+              <img src="media/images/obj2_opt.png"  height="40" width="40" id="cogido_izq_2">
+            </div>
+
+          </div>
+        </div>
+
+
+        <!--popup de lucha con enemigo-->
+        <div id="myModal_lucha" class="modal_lucha">
+          <div class="modal-lucha">
+            <span class="close">&times;</span><!--añado cruz para cerrar popup-->
+            <h4>QUE EMPIEZE LA LUCHA</h4>
+            <div class="flex_lucha">
+              <div class="img_enemigo">
+              <h4>ENEMIGO</h4>
+              <img src="media/images/enemigo1.png"  height="80" width="60" id="img_enemigo1n2">
+              <img src="media/images/enemigo2.png"  height="80" width="60" id="img_enemigo2n2">
+              <p id="enemigo_defensa">DEFENSA:</p>
+              <p id="enemigo_ataque">ATAQUE:</p>
+            </div>
+            <div class="flex_botton_huir_luchar">
+                <button type="button" onclick = "huir()"class="button_luchar_huir">HUIR</button>
+                <button type="button" onclick = "luchar()"class="button_luchar_huir">LUCHAR</button>
+            </div>
+            <div class="objetos_mano">
+              <div class="right">
+                <p id="lucha_mano_derecha">MANO DERECHA:</p>
+                <img src="media/images/obj1.png"  height="80" width="60" id="img_mano_derecha1">
+                <img src="media/images/obj2_opt.png"  height="80" width="60" id="img_mano_derecha2">
+                <img src="media/images/obj3.png"  height="80" width="60" id="img_mano_derecha3">
+                <p id="player_defensa_derecha">Defensa: </p>
+                <p id="player_ataque_derecha">Ataque: </p>
+              </div>
+              <div class="left">
+                  <p id="lucha_mano_left">MANO IZQUIERDA:</p>
+                  <img src="media/images/obj1.png"  height="80" width="60" id="img_mano_left1">
+                  <img src="media/images/obj2_opt.png"  height="80" width="60" id="img_mano_left2">
+                  <img src="media/images/obj3.png"  height="80" width="60" id="img_mano_left3">
+                  <p id="player_defensa_izq">Defensa: </p>
+                  <p id="player_ataque_izq">Ataque: </p>
+                </div>
+                
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <section id="equipocarac" class="equipocarac">
           <h2>Equipo & Caracterí­sticas</h2>
           <h3>Nombre/Sexo: <span></span></h3>
@@ -59,4 +131,6 @@
   
   </section>
   </body>
+  <script src="js/juego.js"></script>
+  <script src="js/main.js"></script>
 </html>

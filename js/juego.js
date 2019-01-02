@@ -6,7 +6,10 @@ var partida = {};
 */
 var mapa = [];
 
-var objetos = {
+
+var enemigo = [];
+
+/*var objetos = {
   garrote: {ataque:1, defensa:0},
   llave: {}
 };
@@ -20,18 +23,19 @@ var enemigo = {
   img:"",
   objetos:[]
 }
-
+*/
 var player = {
   nombre:"",
   vida:10,
-  nivel:0,
+  nivel:-2,
+  pGuardadas: 2, //Controla las partidas que tiene guardadas el Usuario. 
   xp:0,
   ataque:2,
   defensa:2,
-  manoderecha:"garrot",
-  manoizquierda:"",
+  manoderecha:0,//emepzamos sin objectos (ni en las manos, ni en la mochila)
+  manoizquierda:0,
   mochila:[],
-  estadoPartida: {
+  estadoPartida: {//ASSIGNACION VALORES INICIALES
     x:0,
     y:9,
     nivel:-2,
@@ -61,3 +65,6 @@ function pintaImagen(src, x, y) {
 function pintaPosicion(x, y) {
   pintaImagen(mapaToImg(x, y), 0, 0);
 }
+
+
+
