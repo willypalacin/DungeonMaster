@@ -436,9 +436,36 @@ function arrow_clicked(boton) {
   console.log("Direccion Partida   " + player.estadoPartida.direccion);
   console.log("POS_X: " + player.estadoPartida.x + "POS_Y: " + player.estadoPartida.y);
   pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+  comprobarSubirNivel(player.estadoPartida.x, player.estadoPartida.y, player.estadoPartida.direccion);
   
 
 }
+
+/*Comprueba si es hora de subir de nivel*/
+function comprobarSubirNivel(x, y, dir) {
+  var puntos = -1 * player.nivel * player.xp;
+  var ok = 0;
+  if(player.nivel == -2 && dir == 1 && x == 8 && y == 0 && puntos >= 20 ) {
+    player.nivel = -1;
+    ok = 1;
+
+  } else if(player.nivel == -2 && dir == 0 && x == 9 && y == 1 && puntos >= 49) {
+    player.nivel = -1;
+    ok = 1;
+  }
+
+  if(ok == 1) {
+    player.estadoPartida.x = 0;
+    player.estadoPartida.y = 9;
+    inicializarMiniMapa();//y lleno mapa[]
+    pintarCasillaActual();
+    eliminarCasillaActual();
+    pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+    playerModelToScreen();
+
+  }
+} 
+
 /*Guille: Funcion que en base a una coordenada encuentra la casilla asociada */
 function localizarCasilla(y, x) {
   for(var i = 0; i<mapa.length;i++) {
@@ -468,8 +495,10 @@ function mapaToImg(x, y) {
   /*Según el estado de la direción  */
   switch(player.estadoPartida.direccion) {
     case 0: /*norte*/
-    console.log("case 0: ");
-    if(x == 9 && y == 1) return "dungeon_door.png"; /*Si estamos delante de la puerta*/ 
+      console.log("case 0: ");
+     if(x == 9 && y == 1) {
+      return "dungeon_door.png";
+      } /*Si estamos delante de la puerta*/ 
       else {
         if(y == 0) {
           return "dungeon_wall.png" ;
@@ -490,6 +519,8 @@ function mapaToImg(x, y) {
                   break;
                 
                   default:
+                    if(localizarCasilla(x,y-1).oscuridad) return "dungeon_wall.png";
+	                    else return "dungeon_step.png";
                     break;
                 }
                 return "dungeon_step.png";
@@ -609,7 +640,55 @@ function inicializarMiniMapa() {
     colocarObj("81",1); 
     colocarObj("61",2);
     colocarEnemigo("82",1);
-  } 
+  }
+  else if(player.nivel == -1) {
+    var minimapaDOM = document.getElementById("mapacanvas")
+    for (var i = 0; i<100; i++) {
+      
+      minimapaDOM.removeChild(minimapaDOM.firstChild);
+      
+      mapa.splice(i, 1);
+
+    } 
+  /* Crea dinámicamente las casillas del minimapa */
+    for (var i = 0; i<10; i++) {
+      for (var j = 0; j <10;j++) {
+       var casilla = document.createElement("div");
+       casilla.style.border = "4.5px solid white";
+       casilla.id = "casilla" + i + j;
+       casilla.style.width = "20px";
+       casilla.style.height = "20px"; 
+       if(i == 0 && j == 9) {//salida
+          casilla.style.backgroundColor = "yellow";
+        }
+        var casillaMiniMapa = new casillaMapa(i,j);//poso x,y,oscuridad
+        mapa.push(casillaMiniMapa); //afegim a la var mapa[]
+     
+        minimapaDOM.appendChild(casilla);//appendChild--> añadir item a una lista
+      
+      //console.log(casilla.id);
+      }
+    }
+
+    pintarMinimapa("00","90","columna",0);
+    pintarMinimapa("01","81","columna",0);
+    pintarMinimapa("10","13","fila",0);
+    pintarMinimapa("80","87","fila",0);
+    pintarMinimapa("19","99","columna",0);
+    pintarMinimapa("44","47","fila",0);
+    pintarMinimapa("34","54","columna",0);
+    pintarMinimapa("33","34","fila",0);
+    pintarMinimapa("77","87","columna",0);
+    pintarMinimapa("16","36","columna",0);
+    pintarMinimapa("16","19","fila",0);
+    pintarMinimapa("47","57","columna",0);
+    colocarObj("81",1); 
+    colocarObj("61",2);
+    colocarEnemigo("82",1);
+
+
+
+  }
 }
 
 //marco en la casilla correspondiente del mapa que hay un enemigo

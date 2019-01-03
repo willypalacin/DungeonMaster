@@ -29,7 +29,7 @@ var player = {
   vida:10,
   nivel:-2,
   pGuardadas: 2, //Controla las partidas que tiene guardadas el Usuario. 
-  xp:0,
+  xp:21,
   ataque:2,
   defensa:2,
   manoderecha:0,//emepzamos sin objectos (ni en las manos, ni en la mochila)
