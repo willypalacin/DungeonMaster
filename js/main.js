@@ -713,6 +713,19 @@ function cargarPartida() {
     var part = prompt("Actualmente existen 2 partidas guardadas, seleccione cual quiere iniciar " + p1.nombre + " o " + p2.nombre ,"Introduzca el nombre de la partida");
     comprobacionPartida(part, p1, p2);
     playerModelToScreen();
+  } else {
+    if(partidasGuardadas[0] == "2"){
+      var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
+      alert("Actualmente solo existe 1 partidas guardada, recuperando  partida: " + p2.nombre);
+      player = p2;
+      playerModelToScreen();
+     } else {
+      var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
+      alert("Actualmente solo existe 1 partidas guardada, recuperando  partida: " + p1.nombre);
+      player = p1;
+      playerModelToScreen();
+     }
+
   }
 }
 
@@ -733,6 +746,35 @@ function comprobacionNombre(part, p1, p2) {
   } 
   console.log("PARTIDA GUARDADA"); 
   return ok;
+}
+
+function eliminarPartida() {
+  var partidasGuardadas = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8"));
+  switch (partidasGuardadas.length) {
+    case 2:
+      var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
+      var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
+      var part = prompt("Actualmente existen 2 partidas guardadas, seleccione cual quiere borrar " + p1.nombre + " o " + p2.nombre ,"Introduzca el nombre de la partida");
+      if (part == p1.nombre) httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1");
+      else if(part == p2.nombre) httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2");
+      else alert("la partida introducida no corresponde con ninguna de las guardadas");
+      break;
+    case 1: 
+      if (partidasGuardadas[0] == "2") {
+        var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
+        alert("Eliminando la única partida que existe " + p2.nombre); 
+        httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1");
+      } else {
+        var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
+        alert("Eliminando la única partida que existe " + p1.nombre); 
+        httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1");
+      }
+      break;
+    case 0:
+      alert("No hay partidas almacenadas en el sistema");
+      break;
+  }
+
 }
 
 function comprobacionPartida(part, p1, p2) {
