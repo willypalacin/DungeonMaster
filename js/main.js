@@ -111,6 +111,7 @@ function comenzarPartida() {//button COMENZAR PARTIDA
   pintarCasillaActual();
   eliminarCasillaActual();
   pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+  playerModelToScreen();
   
 }
 
@@ -666,50 +667,91 @@ function pintarMinimapa(inicio, fin, tipo, actual) {
 }
 
 function guardarPartida() {
-  switch (player.pGuardadas) {
-    case 0: 
-      var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1";
-      httpPostRequest(url,JSON.stringify(player));
-      player.pGuardadas++;
-      console.log("PARTIDA GUARDADA");
-      
-    
-    break;
-    case 1: 
-      var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2";
-      player.pGuardadas++;
-      httpPostRequest(url,JSON.stringify(player));
-      console.log("PARTIDA GUARDADA");
-      
-      break;
-    case 2: 
-      var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
-      var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
-      var ok = false;
-      do {
-        var part = prompt("Actualmente existen 2 partidas guardadas, seleccione cual quiere borrar " + p1.nombre + " o " + p2.nombre ,"Introduzca el nombre de la partida");
+  /*Se encarga de leer que hay en el HTML*/ 
+  var partidasGuardadas = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8"));
+
+    switch (partidasGuardadas.length) {
+      case 0: 
         var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1";
-        if(part == p1.nombre) {
-            ok = true;
-            httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1");
-            console.log("ELIMINADO SLOT 1");
-            var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1";
-            httpPostRequest(url,JSON.stringify(player));
-        } else if(part == p2.nombre) {
-          ok = true;
-          httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2");
+        httpPostRequest(url,JSON.stringify(player));
+        player.pGuardadas++;
+        console.log("PARTIDA GUARDADA");
+        break;
+      case 1: 
+        if(partidasGuardadas[0] == "2"){
+         var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1";
+         player.pGuardadas++;
+         httpPostRequest(url,JSON.stringify(player));
+          console.log("PARTIDA GUARDADA");
+        } else {
           var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2";
+          player.pGuardadas++;
           httpPostRequest(url,JSON.stringify(player));
-        } 
-      console.log("PARTIDA GUARDADA");
-      } while(ok == false);
-    break;
-    
-    
-
-
-
+          console.log("PARTIDA GUARDADA");
+        }
+        
+        break;
+      case 2: 
+        var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
+        var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
+        var ok = false;
+        do {
+          var part = prompt("Actualmente existen 2 partidas guardadas, seleccione cual quiere borrar " + p1.nombre + " o " + p2.nombre ,"Introduzca el nombre de la partida");
+          var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1";
+          ok = comprobacionNombre(part, p1,p2);
+        } while(ok == false);
+      break;
+      
+    }
+}
+function cargarPartida() {
+  var partidasGuardadas = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8"));
+  console.log(partidasGuardadas.length);
+  if(partidasGuardadas.length == 2) { 
+    var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
+    var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
+    var part = prompt("Actualmente existen 2 partidas guardadas, seleccione cual quiere iniciar " + p1.nombre + " o " + p2.nombre ,"Introduzca el nombre de la partida");
+    comprobacionPartida(part, p1, p2);
+    playerModelToScreen();
   }
+}
+
+function comprobacionNombre(part, p1, p2) {
+  /*Comprueba si el nombre introducido es correcto*/
+  var ok = false;
+  if(part == p1.nombre) {
+    ok = true;
+    httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1");
+    console.log("ELIMINADO SLOT 1");
+    var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1";
+    httpPostRequest(url,JSON.stringify(player));
+  } else if(part == p2.nombre) {
+    ok = true;
+    httpDeleteRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2");
+    var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2";
+    httpPostRequest(url,JSON.stringify(player));
+  } 
+  console.log("PARTIDA GUARDADA"); 
+  return ok;
+}
+
+function comprobacionPartida(part, p1, p2) {
+  if(part == p1.nombre) {
+    player = p1;
+  } else if(part == p2.nombre) {
+    player = p2;
+  } else {
+    alert("La partida introducida no es correcta")
+  }
+  console.log("PARTIDA GUARDADA");
+}
+
+function playerModelToScreen(){
+  document.getElementById("nombre").innerHTML = player.nombre;
+  document.getElementById("nivel").innerHTML = player.nivel;
+  document.getElementById("ataque").innerHTML = player.ataque;
+  document.getElementById("defensa").innerHTML = player.defensa;
+  document.getElementById("vida").innerHTML = player.vida;
 }
   
 
