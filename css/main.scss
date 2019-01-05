@@ -1,0 +1,273 @@
+
+$color_seccion: #A9F5D0;
+$color_fondo:#DB7093;
+
+$color_black: black;
+
+$fuente: Arial;
+
+
+body{
+    background-image: url(/media/images/dungeon_step.png);
+  }
+  h1{
+    text-align:center;
+    color:$color_blak;
+    font-size: 3em;
+    font-display: $fuente;
+  }
+  
+  h2{
+    text-align:center;
+    color:white;
+    font-size: 2em;
+    font-display: $fuente;
+  }
+  
+  h3{
+    color: white;
+    font-size: em;
+    font-display: $fuente;
+  }
+  h4{
+    color: $color_fondo;
+    font-size: em;
+    font-display: $fuente;
+    justify-content: center;
+  }
+  
+  .flex_top{
+    display: flex;
+    flex-direction: row;
+    flex-flow: row wrap;
+    justify-content: center;
+  }
+  p{
+    color:$color_blak;
+    font-size: em;
+    font-display: $fuente;
+  }
+  .button_coger{
+    background-color: $color_fondo;
+    color: white;
+    padding: 10px;
+    text-align: space-between;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: em;
+    margin: 30px 65px;
+    border-radius: 8px;
+  }
+  .button_com_guardar {
+    background-color: $color_fondo;
+    border: none;
+    color: white;
+    padding: 20px;
+    text-align: space-between;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin: 30px 65px;
+    border-radius: 8px;
+  
+  
+  }
+  .button_luchar_huir{
+    background-color: $color_fondo;
+    border: none;
+    color: white;
+    padding: 15px;
+    text-align: space-between;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin: 15px 35px;
+    border-radius: 8px;
+    opacity: 1;
+  }
+  .controles{
+    justify-content: center;
+    background-color:whitesmoke;
+  }
+  .grid_flechas{
+    display: grid;
+    grid-gap:25px;
+    grid-template-columns: 50px 50px 50px;
+    
+    justify-content: center;
+  }
+  .objetos_mano{
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  
+  .flex_botton_huir_luchar{
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  .flex_lucha{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+  .flex_bottom{
+    display: flex;
+    flex-direction: row;
+    flex-flow: row wrap;
+    justify-content: space-around;
+  }
+  .flex_esq{
+    display: flex;
+    flex-direction: column;
+    flex-flow: column wrap;
+    justify-content: space-around;
+  }
+  
+  
+  
+  .navegacion {
+    grid-area: navegacion;
+    background-color: $color_fondo;
+    float:left;
+    
+  }
+  
+  .equipocarac {
+    grid-area: equipo;
+    background-color: $color_fondo;
+    float:left;
+  }
+  .mapa{
+    grid-area: mapa;
+    background-color: $color_fondo;
+    float:left;
+  
+  }
+  
+  #mapacanvas {
+  
+    display: flex;
+    flex-wrap: wrap;
+    height: 290px;
+    width: 290px;
+  
+  }
+  
+  
+  
+  /*POPUP al clicar sobre visor, cuando hay obj o enemigo*/
+  /* The Modal (background) */
+  .modal {
+    display: none;/*transparente por default*/
+    position: fixed; 
+    z-index: 1; /*1: el popup estara encima lo demas, -1: el popup estarà detrás de lo demas*/
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 50%; 
+    overflow: auto; /* permite scroll */
+    background-color: rgba(0,0,0,0.5); /* $color_blak w/ opacityity */
+  }
+  .modal_lucha {
+    display: none;/*transparente por default*/
+    position: fixed; 
+    z-index: 1; /*1: el popup estara encima lo demas, -1: el popup estarà detrás de lo demas*/
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 50%; 
+    overflow: auto; /* permite scroll */
+    background-color: rgba(0,0,0,0.5); /* $color_blak w/ opacityity */
+  }
+
+  #homaimg{
+      opacity: 0;
+  }
+  #donaimg{
+    opacity: 0;
+}
+
+  #img_mano_derecha1{
+    opacity: 0;
+  }
+  #img_mano_derecha2{
+    opacity: 0;
+  }
+  #img_mano_derecha3{
+    opacity: 0;
+  }
+  #img_mano_left1{
+    opacity: 0;
+  }
+  #img_mano_left2{
+    opacity: 0;
+  }
+  #img_mano_left3{
+    opacity: 0;
+  }
+  #img_enemigo1n2{
+    opacity: 0;
+  }
+  #img_enemigo2n2{
+    opacity: 0;
+  }
+  /*Todos los objetos que existan en el nivel pero que no tengamos en la mochila, los mostramos "transparentes"*/
+  #obj1n2{
+    opacity: 0;
+  }
+  #obj2n2{
+    opacity: 0;
+  }
+  #cogido_derecha_2{
+    opacity: 0;
+  }
+  #cogido_derecha_1{
+    opacity: 0;
+  }
+  #cogido_izq_1{
+    opacity: 0;
+  }
+  #cogido_izq_2{
+    opacity: 0;
+  }
+  /* contenido popup objectos*/
+  .modal-obj {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 100%; /* Could be more or less, depending on screen size */
+  }
+  .modal-lucha {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 100%; /* Could be more or less, depending on screen size */
+  }
+  
+  /* The Close Button */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: $color_blak;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  
+  
+  

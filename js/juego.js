@@ -9,27 +9,12 @@ var mapa = [];
 
 var enemigo = [];
 
-/*var objetos = {
-  garrote: {ataque:1, defensa:0},
-  llave: {}
-};
-
-
-var enemigo = {
-  vida:0,
-  ataque:0,
-  defensa:0,
-  xp:0,
-  img:"",
-  objetos:[]
-}
-*/
 var player = {
   nombre:"",
   vida:10,
   nivel:-2,
   pGuardadas: 2, //Controla las partidas que tiene guardadas el Usuario. 
-  xp:21,
+  xp:6,//quan arribi a 10 passa a nivell -1
   ataque:2,
   defensa:2,
   manoderecha:0,//emepzamos sin objectos (ni en las manos, ni en la mochila)

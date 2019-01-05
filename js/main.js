@@ -9,6 +9,12 @@ var objCogidos = {
   obj1_i : false,
   obj2_i : false,
 }
+
+
+var luchar_huir = {
+  turno_player : false,
+  huir: false,
+}
 /*Contiene la información de los objetos que posee cada enemigo*/
 function enemigoObjetos(ataque, defensa, img){
   this.ataque = ataque;
@@ -21,20 +27,21 @@ function enemigoObjetos(ataque, defensa, img){
   img: source de la imagen correspondiente con el id del enemigo 
   objectos--> array de tipo enemigoObjeto
 */
-function initEnemigo(id, ataque, defensa, xp, img, objetos){ //lleno player.mochila con objetosEncontrados
+function initEnemigo(vida, id, ataque, defensa, xpp, img, objetos){ //lleno player.mochila con objetosEncontrados
+  this.vida = vida;
   this.id = id;
   this.ataque = ataque;
   this.defensa = defensa;
-  this.xp = xp;
+  this.xpp = xpp;
   this.img = img;
   this.objetos = objetos;
 }
-/*Llama a la API*/ 
-function httpGetRequest(theUrl)
-{
+/*Llamar API*/ 
+function httpGetRequest(theUrl){
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
     xmlHttp.send( null );
+    console.log(xmlHttp.responseText)
     return xmlHttp.responseText;
 }
 
@@ -103,10 +110,33 @@ function pintarCasillaActual() {
   imgPosActual.id = "posActual";
   document.getElementById("casilla" +player.estadoPartida.y + player.estadoPartida.x).appendChild(imgPosActual);
 }
+function comprobacionSexo(part) {
+  var ok = 0;
+  if(part == "mujer") {
+    ok = 1;
+    document.getElementById("homaimg").style.opacity= 0;
+    document.getElementById("donaimg").style.opacity= 1;
 
+  } else{
+    if(part == "hombre"){
+        ok = 1;
+        
+    document.getElementById("homaimg").style.opacity= 1;
+    document.getElementById("donaimg").style.opacity= 0;
+    }
+  }
+  
+  return ok;
+}
 function comenzarPartida() {//button COMENZAR PARTIDA
   var part = prompt("indique un nombre a la partida", "Introduzca el nombre de la partida");
   player.nombre = part;
+  var good = 0;
+  do{
+    part = prompt("Indique de que sexo es su personage: mujer o hombre", "mujer o hombre");
+    good = comprobacionSexo(part);
+  }while(good = 1)
+ 
   inicializarMiniMapa();//y lleno mapa[]
   pintarCasillaActual();
   eliminarCasillaActual();
@@ -128,8 +158,13 @@ span.onclick = function() {
 window.onclick = function(event) {
   if (event.target == modal) {
     modal.style.display = "none";
+    
   }
   if (event.target == modal_lucha) {
+    
+    document.getElementById("luchar").style.opacity= 1;
+    document.getElementById("huir").style.opacity= 1;
+  
     modal_lucha.style.display = "none";
   }
 }
@@ -140,6 +175,9 @@ var span_lucha = document.getElementsByClassName("close")[0];//la curz del popup
 
 //podemos cerrar la popup con la cruz(span) o clicando en la zona translucida
 span_lucha.onclick = function() {
+  
+  document.getElementById("luchar").style.opacity= 1;
+  document.getElementById("huir").style.opacity= 1;
   modal_lucha.style.display = "none";
 }
 
@@ -176,7 +214,7 @@ function CogerObjMano(mano){
           objCogidos.obj1_d = true;
           objCogidos.obj2_d = false;
           player.manoderecha = 1;
-          
+         
 
           
           break;
@@ -217,20 +255,46 @@ function CogerObjMano(mano){
   
     break;
   }
+  //CALCULO DEFENSA Y ATAQUE TOTAL DE PLAYER
+  if(player.manoderecha == player.manoizquierda == 0){
+    player.ataque = 2;
+    player.defensa = 2;
+  }
+  if((player.manoderecha ==1 &&player.manoizquierda ==2 )||(player.manoderecha == 2 && player.manoizquierda == 1)){
+    player.ataque = 10;
+    player.defensa = 11;
+  }
+  if((player.manoderecha ==1 &&player.manoizquierda ==0 )||(player.manoderecha == 0 && player.manoizquierda == 1)){
+    player.ataque = 7;
+    player.defensa = 9;
+
+  }
+  if((player.manoderecha ==2 &&player.manoizquierda ==0 )||(player.manoderecha == 0 && player.manoizquierda == 2)){
+    player.ataque = 5;
+    player.defensa = 4;
+
+  }
+  
+  //muestro en el popup de lucha los puntos de defensa y ataque total del player --> son los q iran en la url para peticion api ataque
+  document.getElementById("total_defensa_player").innerHTML = "DEFENSA TOTAL: "+ player.defensa;
+  document.getElementById("total_ataque_player").innerHTML = "ATAQUE TOTAL: "+ player.ataque;
+
 
 }
 
 function defensaEnemigo(id_enemigo) {
   for(var i=0; i<enemigo.length; i++){
     if(id_enemigo == enemigo[i].id){
-      return enemigo[i].defensa;
+     
+      return enemigo[i].defensa + enemigo[i].objetos.defensa;
     }
   }
+
 }
 function ataqueEnemigo(id_enemigo) {
   for(var i=0; i<enemigo.length; i++){
     if(id_enemigo == enemigo[i].id){
-      return enemigo[i].ataque;
+      return enemigo[i].ataque +enemigo[i].objetos.ataque;
     }
   }
 }
@@ -245,14 +309,18 @@ function clickVisor(){
       if(localizarCasilla(player.estadoPartida.x, player.estadoPartida.y-1).obj!=0){
         switch (localizarCasilla(player.estadoPartida.x, player.estadoPartida.y-1).obj) {
           case 1:
-            var encontrado = new objectosEncontrados(1, 1, 1);//defensa y ataque se debe cambiar, segun valores retorno api lucha
+            var encontrado = new objectosEncontrados(1, 7, 5);//id_obj, defensa y ataque se debe cambiar, segun valores retorno api lucha
             player.mochila.push(encontrado); //afegim a la var mapa[]
+            //pintaImagen("dungeon_step.png", 0, 0);
+
             document.getElementById("obj1n2").style.opacity= 1;
             break;
           case 2:
             var encontrado = new objectosEncontrados(2, 2, 3);//defensa y ataque se debe cambiar, segun valores retorno api lucha
             player.mochila.push(encontrado); //afegim a la var mapa[]
             document.getElementById("obj2n2").style.opacity= 1;
+            
+            
             break;
         
         }
@@ -268,8 +336,11 @@ function clickVisor(){
             var ataque = ataqueEnemigo(1);
             document.getElementById("img_enemigo1n2").style.opacity= 1; 
             document.getElementById("img_enemigo2n2").style.opacity= 0; 
-            document.getElementById("enemigo_defensa").innerHTML = "DEFENSA:  "+defensa;   
-            document.getElementById("enemigo_ataque").innerHTML = "ATAQUE:  "+ataque;       
+
+
+
+           document.getElementById("enemigo_defensa").innerHTML = "DEFENSA:  "+defensa;   
+            document.getElementById("enemigo_ataque").innerHTML = "ATAQUE:  "+ataque;    
             console.log(player.manoizquierda+"muajjajaj");
             switch (player.manoderecha) {
               case 1:
@@ -338,6 +409,10 @@ function clickVisor(){
     break;
 
     case 1://este
+
+
+
+
     if(localizarCasilla(player.estadoPartida.x+1, player.estadoPartida.y).obj!=0){
       //player.mochila.push(localizarCasilla(player.estadoPartida.x+1, player.estadoPartida.y).obj);//añadimos un 1 o 2, para saber q objeto hemos encontrado y añadido a la mochila
       switch (localizarCasilla(player.estadoPartida.x+1, player.estadoPartida.y).obj) {
@@ -345,6 +420,8 @@ function clickVisor(){
         var encontrado = new objectosEncontrados(1, 1, 1);//defensa y ataque se debe cambiar, segun valores retorno api lucha
           player.mochila.push(encontrado); //afegim a la var mapa[]
           document.getElementById("obj1n2").style.opacity= 1;
+
+
           break;
         case 2:
           var encontrado = new objectosEncontrados(2, 2, 3);//defensa y ataque se debe cambiar, segun valores retorno api lucha
@@ -355,6 +432,82 @@ function clickVisor(){
       }
       modal.style.display = "block";
     }
+      //miramos si hay enemigo
+      if(localizarCasilla(player.estadoPartida.x+1, player.estadoPartida.y).enemigo!=0){
+        switch (localizarCasilla(player.estadoPartida.x+1, player.estadoPartida.y).enemigo) {
+          case 1://enemigo1 --> michy
+            var defensa = defensaEnemigo(1);
+            var ataque = ataqueEnemigo(1);
+            document.getElementById("img_enemigo1n2").style.opacity= 1; 
+            document.getElementById("img_enemigo2n2").style.opacity= 0; 
+
+
+
+           document.getElementById("enemigo_defensa").innerHTML = "DEFENSA:  "+defensa;   
+            document.getElementById("enemigo_ataque").innerHTML = "ATAQUE:  "+ataque;    
+            console.log(player.manoizquierda+"muajjajaj");
+            switch (player.manoderecha) {
+              case 1:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+1;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+1;
+              document.getElementById("img_mano_derecha1").style.opacity = 1;
+              document.getElementById("img_mano_derecha2").style.opacity = 0;
+              document.getElementById("img_mano_derecha3").style.opacity = 0;
+              break;
+            
+              case 2:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+3;
+              document.getElementById("img_mano_derecha1").style.opacity = 0;
+              document.getElementById("img_mano_derecha2").style.opacity = 1;
+              document.getElementById("img_mano_derecha3").style.opacity = 0;
+              break;
+
+              case 3:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+2;
+              document.getElementById("img_mano_derecha1").style.opacity = 0;
+              document.getElementById("img_mano_derecha2").style.opacity = 0;
+              document.getElementById("img_mano_derecha3").style.opacity = 1;
+              break;
+            }
+            switch (player.manoizquierda) {
+              case 1:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+1;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+1;
+              document.getElementById("img_mano_left1").style.opacity = 1;
+              document.getElementById("img_mano_left2").style.opacity = 0;
+              document.getElementById("img_mano_left3").style.opacity = 0;
+              break;
+            
+              case 2:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+3;
+              document.getElementById("img_mano_left1").style.opacity = 0;
+              document.getElementById("img_mano_left2").style.opacity = 1;
+              document.getElementById("img_mano_left3").style.opacity = 0;
+              break;
+
+              case 3:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+2;
+              document.getElementById("img_mano_left1").style.opacity = 0;
+              document.getElementById("img_mano_left2").style.opacity = 0;
+              document.getElementById("img_mano_left3").style.opacity = 1;
+              break;
+            }
+            break;
+        
+          case 2:
+            document.getElementById("img_enemigo1n2").style.opacity= 2; 
+            document.getElementById("img_enemigo2n2").style.opacity= 1;
+            break;
+        }
+        
+        
+        modal_lucha.style.display = "block";
+      }
+
     break;
 
     case 2://sur
@@ -375,6 +528,81 @@ function clickVisor(){
       }
       modal.style.display = "block";
     }
+      //miramos si hay enemigo
+      if(localizarCasilla(player.estadoPartida.x, player.estadoPartida.y+1).enemigo!=0){
+        switch (localizarCasilla(player.estadoPartida.x, player.estadoPartida.y+1).enemigo) {
+          case 1://enemigo1 --> michy
+            var defensa = defensaEnemigo(1);
+            var ataque = ataqueEnemigo(1);
+            document.getElementById("img_enemigo1n2").style.opacity= 1; 
+            document.getElementById("img_enemigo2n2").style.opacity= 0; 
+
+
+
+           document.getElementById("enemigo_defensa").innerHTML = "DEFENSA:  "+defensa;   
+            document.getElementById("enemigo_ataque").innerHTML = "ATAQUE:  "+ataque;    
+            console.log(player.manoizquierda+"muajjajaj");
+            switch (player.manoderecha) {
+              case 1:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+1;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+1;
+              document.getElementById("img_mano_derecha1").style.opacity = 1;
+              document.getElementById("img_mano_derecha2").style.opacity = 0;
+              document.getElementById("img_mano_derecha3").style.opacity = 0;
+              break;
+            
+              case 2:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+3;
+              document.getElementById("img_mano_derecha1").style.opacity = 0;
+              document.getElementById("img_mano_derecha2").style.opacity = 1;
+              document.getElementById("img_mano_derecha3").style.opacity = 0;
+              break;
+
+              case 3:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+2;
+              document.getElementById("img_mano_derecha1").style.opacity = 0;
+              document.getElementById("img_mano_derecha2").style.opacity = 0;
+              document.getElementById("img_mano_derecha3").style.opacity = 1;
+              break;
+            }
+            switch (player.manoizquierda) {
+              case 1:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+1;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+1;
+              document.getElementById("img_mano_left1").style.opacity = 1;
+              document.getElementById("img_mano_left2").style.opacity = 0;
+              document.getElementById("img_mano_left3").style.opacity = 0;
+              break;
+            
+              case 2:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+3;
+              document.getElementById("img_mano_left1").style.opacity = 0;
+              document.getElementById("img_mano_left2").style.opacity = 1;
+              document.getElementById("img_mano_left3").style.opacity = 0;
+              break;
+
+              case 3:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+2;
+              document.getElementById("img_mano_left1").style.opacity = 0;
+              document.getElementById("img_mano_left2").style.opacity = 0;
+              document.getElementById("img_mano_left3").style.opacity = 1;
+              break;
+            }
+            break;
+        
+          case 2:
+            document.getElementById("img_enemigo1n2").style.opacity= 2; 
+            document.getElementById("img_enemigo2n2").style.opacity= 1;
+            break;
+        }
+        
+        
+        modal_lucha.style.display = "block";
+      }
     break;
 
     case 3://oeste
@@ -395,6 +623,81 @@ function clickVisor(){
       }
       modal.style.display = "block";
     }
+      //miramos si hay enemigo
+      if(localizarCasilla(player.estadoPartida.x-1, player.estadoPartida.y).enemigo!=0){
+        switch (localizarCasilla(player.estadoPartida.x-1, player.estadoPartida.y).enemigo) {
+          case 1://enemigo1 --> michy
+            var defensa = defensaEnemigo(1);
+            var ataque = ataqueEnemigo(1);
+            document.getElementById("img_enemigo1n2").style.opacity= 1; 
+            document.getElementById("img_enemigo2n2").style.opacity= 0; 
+
+
+
+           document.getElementById("enemigo_defensa").innerHTML = "DEFENSA:  "+defensa;   
+            document.getElementById("enemigo_ataque").innerHTML = "ATAQUE:  "+ataque;    
+            console.log(player.manoizquierda+"muajjajaj");
+            switch (player.manoderecha) {
+              case 1:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+1;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+1;
+              document.getElementById("img_mano_derecha1").style.opacity = 1;
+              document.getElementById("img_mano_derecha2").style.opacity = 0;
+              document.getElementById("img_mano_derecha3").style.opacity = 0;
+              break;
+            
+              case 2:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+3;
+              document.getElementById("img_mano_derecha1").style.opacity = 0;
+              document.getElementById("img_mano_derecha2").style.opacity = 1;
+              document.getElementById("img_mano_derecha3").style.opacity = 0;
+              break;
+
+              case 3:
+              document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_derecha").innerHTML = "Ataque:  "+2;
+              document.getElementById("img_mano_derecha1").style.opacity = 0;
+              document.getElementById("img_mano_derecha2").style.opacity = 0;
+              document.getElementById("img_mano_derecha3").style.opacity = 1;
+              break;
+            }
+            switch (player.manoizquierda) {
+              case 1:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+1;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+1;
+              document.getElementById("img_mano_left1").style.opacity = 1;
+              document.getElementById("img_mano_left2").style.opacity = 0;
+              document.getElementById("img_mano_left3").style.opacity = 0;
+              break;
+            
+              case 2:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+3;
+              document.getElementById("img_mano_left1").style.opacity = 0;
+              document.getElementById("img_mano_left2").style.opacity = 1;
+              document.getElementById("img_mano_left3").style.opacity = 0;
+              break;
+
+              case 3:
+              document.getElementById("player_defensa_izq").innerHTML = "Defensa:  "+2;
+              document.getElementById("player_ataque_izq").innerHTML = "Ataque:  "+2;
+              document.getElementById("img_mano_left1").style.opacity = 0;
+              document.getElementById("img_mano_left2").style.opacity = 0;
+              document.getElementById("img_mano_left3").style.opacity = 1;
+              break;
+            }
+            break;
+        
+          case 2:
+            document.getElementById("img_enemigo1n2").style.opacity= 2; 
+            document.getElementById("img_enemigo2n2").style.opacity= 1;
+            break;
+        }
+        
+        
+        modal_lucha.style.display = "block";
+      }
     break;
   
   }
@@ -407,6 +710,143 @@ function clickVisor(){
   }
   
 }
+
+function conQueEnemigoEstoyLuchando(id){
+  //direccion
+  switch (player.estadoPartida.direccion) {
+    case 0://norte
+      return localizarCasilla(player.estadoPartida.x, player.estadoPartida.y-1).enemigo;
+   break;
+   case 1://norte
+      return localizarCasilla(player.estadoPartida.x, player.estadoPartida.y+1).enemigo;
+   break;
+   case 2://norte
+      return localizarCasilla(player.estadoPartida.x+1, player.estadoPartida.y).enemigo;
+   break;
+   case 3://norte
+      return localizarCasilla(player.estadoPartida.x-1, player.estadoPartida.y).enemigo;
+   break;
+   
+  
+    
+  }
+
+
+}
+function crearUrlLucha(ataque, defensa) {
+  var url = "http://puigpedros.salleurl.edu/pwi/pac4/ataque.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&ataque="+ataque+"&defensa="+defensa;
+  console.log(url);
+  return url;
+}
+
+
+function cuantasVidasEnemigo(id_enemigo) {
+  for(var i=0; i<enemigo.length; i++){
+    if(id_enemigo == enemigo[i].id){
+      console.log(enemigo[i].vida+"vidadadada");
+      return enemigo[i].vida;
+    }
+  }
+}
+function actualizaVidasDefensa(vida, id_enemigo) {
+  for(var i=0; i<enemigo.length; i++){
+    if(id_enemigo == enemigo[i].id){
+      enemigo[i].vida = vida;
+    }
+  }
+}
+
+function actualizaXpPlayer(id_enemigo) {
+  for(var i=0; i<enemigo.length; i++){
+    if(id_enemigo == enemigo[i].id){
+      player.xp = enemigo[i].xpp + player.xp;
+      console.log("xp player"+player.xp);
+    }
+  }
+}
+function actualizarObjPlayer(id_enemigo) {
+  for(var i=0; i<enemigo.length; i++){
+    if(id_enemigo == enemigo[i].id){
+      //sabemos q enemigo solo tiene un objeto
+      player.mochila.push(enemigo[i].objetos);
+      console.log(player.mochila.length); 
+      
+      var encontrado = new objectosEncontrados(2, 2, 3);//defensa y ataque se debe cambiar, segun valores retorno api lucha
+      player.mochila.push(encontrado); //afegim a la var mapa[]
+      document.getElementById("obj2n2").style.opacity= 1;
+         
+      
+      
+    }
+  }
+}
+//Se quitan 3 vidas al jugador cada vez q pulse huir
+function huir() {
+  alert("Has decido huir! Si no eres suficientemente fuerte... Ve y buscar objetos con los que atacar!"); 
+  document.getElementById("luchar").style.opacity= 0;
+}
+
+
+
+
+//Bucle de lucha (peticiones a la API ataque), hasta que jugador o enemigo mueren o jugador pulsa boton HUIR
+function luchar(){
+  document.getElementById("luchar").style.opacity= 1;
+  luchar_huir.turno_player = true;
+  var quitar_atacado = 0;
+  var theUrl;
+  var defensa, ataque, id_enemigo, vidasEnemigo, vidas_defensa = 0;
+  var muerte = false;
+  //while(!muerte){
+    if(luchar_huir.turno_player){//ataca el player
+      id_enemigo = conQueEnemigoEstoyLuchando();
+      defensa = defensaEnemigo(id_enemigo);
+      theUrl = crearUrlLucha(player.ataque, defensa);//ataque player, defensa enemigo
+      quitar_atacado = httpGetRequest(theUrl);
+      vidasEnemigo = cuantasVidasEnemigo(id_enemigo);
+      console.log(vidasEnemigo+": vidas enemigo");
+      vidas_defensa = vidasEnemigo - quitar_atacado;
+      document.getElementById("enemigo_vidas").innerHTML = "VIDAS: "+vidas_defensa;
+      actualizaVidasDefensa(vidas_defensa, id_enemigo);
+      if(vidas_defensa <= 0){
+        actualizaXpPlayer(id_enemigo);
+        actualizarObjPlayer(id_enemigo);
+        alert("Player has ganado la batalla! Se te han añadido los objetos y la xp del enemigo");
+        document.getElementById("luchar").style.opacity= 0;
+        muerte = true;
+      }else{
+        luchar_huir.turno_player = false;
+        document.getElementById("luchar").style.opacity= 0;
+        document.getElementById("huir").style.opacity= 0;
+        alert("Ahora ataca el enemigo, espera hasta que se modifiquen las vidas!");
+      
+
+
+      //ataca el enemigo
+        ataque = ataqueEnemigo(id_enemigo);
+        theUrl = crearUrlLucha(ataque, player.defensa);
+        quitar_atacado = httpGetRequest(theUrl);
+        vidas_defensa = player.vida - quitar_atacado;
+        document.getElementById("player_vidas").innerHTML = "VIDAS: "+vidas_defensa;
+        player.vida = vidas_defensa;
+        console.log(player.vida+"player.vida");
+          
+        if(vidas_defensa < 0){
+          alert("Player has muerto --> ahora willy se debe recuperar partida guardada o empezar una nueva!!!!");
+          document.getElementById("luchar").style.opacity= 0;
+         muerte = true;
+        }else{
+          
+          luchar_huir.turno_player = true;
+          document.getElementById("luchar").style.opacity= 1;
+          document.getElementById("huir").style.opacity= 1;
+        
+        }
+    }
+
+    }
+  }
+//}
 /*Guille: Función que verifica, que se haya pulsado el teclado*/
 function arrow_clicked(boton) {
   eliminarCasillaActual();//borro flechita (minimapa)
@@ -495,7 +935,6 @@ function mapaToImg(x, y) {
   /*Según el estado de la direción  */
   switch(player.estadoPartida.direccion) {
     case 0: /*norte*/
-      console.log("case 0: ");
      if(x == 9 && y == 1) {
       return "dungeon_door.png";
       } /*Si estamos delante de la puerta*/ 
@@ -507,15 +946,22 @@ function mapaToImg(x, y) {
             switch (localizarCasilla(x,y-1).obj) {
               
               case 1:
-                return "obj1.png"
+              if(localizarCasilla(x,y-1).oscuridad){
+                return "martell1p.png"
+              }else{
+                return "martell1x.png"
+              }
               break;
-              case 2:
-                return "obj2_opt.png"
+              case 2:if(localizarCasilla(x,y-1).oscuridad){
+                return "espasa1p.png"
+              }else{
+                return "espasa1x.png"
+              }
               break;
               default:
                 switch (localizarCasilla(x,y-1).enemigo) {
                   case 1:
-                    return "enemigo1.png"
+                    return "e1x.png"
                   break;
                 
                   default:
@@ -538,19 +984,29 @@ function mapaToImg(x, y) {
           return "dungeon_wall.png";
         }else{
           switch (localizarCasilla(x,y+1).obj) {
-            
             case 1:
-              return "obj1.png"
-            break;
-            case 2:
-              return "obj2_opt.png"
-            break;
-            default:
+              if(localizarCasilla(x,y+1).oscuridad){
+                return "martell1p.png"
+              }else{
+                return "martell1x.png"
+              }
+              break;
+              case 2:if(localizarCasilla(x,y+1).oscuridad){
+                return "espasa1p.png"
+              }else{
+                return "espasa1x.png"
+              }
+            
+              default:
+                if(localizarCasilla(x,y+1).oscuridad) return "dungeon_wall.png";
+                  else return "dungeon_step.png";
+                break;
+            }
               return "dungeon_step.png";
             break;
           }
         } 
-       }
+       
       break;  
     case 1: /*este*/
      if(x == 8 && y == 0) return "dungeon_door.png"; /*Si estamos delante dela puerta*/
@@ -564,13 +1020,29 @@ function mapaToImg(x, y) {
           switch (localizarCasilla(x+1,y).obj) {
             
             case 1:
-              return "obj1.png"
+            if(localizarCasilla(x+1,y).oscuridad){
+              return "martell1p.png"
+            }else{
+              return "martell1x.png"
+            }
             break;
-            case 2:
-              return "obj2_opt.png"
+            case 2:if(localizarCasilla(x+1,y).oscuridad){
+              return "espasa1p.png"
+            }else{
+              return "espasa1x.png"
+            }
             break;
             default:
-              return "dungeon_step.png";
+            switch (localizarCasilla(x+1,y).enemigo) {
+              case 1:
+                return "e1x.png"
+              break;
+            
+              default:
+                if(localizarCasilla(x+1,y).oscuridad) return "dungeon_wall.png";
+                break;
+            }
+            return "dungeon_step.png";
             break;
           }
         }
@@ -588,12 +1060,30 @@ function mapaToImg(x, y) {
           switch (localizarCasilla(x-1,y).obj) {
             
             case 1:
-              return "obj1.png"
+            if(localizarCasilla(x-1,y).oscuridad){
+              return "martell1p.png"
+            }else{
+              return "martell1x.png"
+            }
             break;
             case 2:
-              return "obj2_opt.png"
+            if(localizarCasilla(x-1,y).oscuridad){
+              return "espasa1p.png"
+            }else{
+              return "espasa1x.png"
+            }
             break;
             default:
+            switch (localizarCasilla(x-1,y).enemigo) {
+              case 1:
+                return "e1x.png"
+              break;
+            
+              default:
+                if(localizarCasilla(x-1,y).oscuridad) return "dungeon_wall.png";
+                  else return "dungeon_step.png";
+                break;
+            }
               return "dungeon_step.png";
             break;
           }
@@ -683,7 +1173,7 @@ function inicializarMiniMapa() {
     pintarMinimapa("16","19","fila",0);
     pintarMinimapa("47","57","columna",0);
     colocarObj("81",1); 
-    colocarObj("61",2);
+    //colocarObj("61",2);
     colocarEnemigo("82",1);
 
 
@@ -696,8 +1186,8 @@ function colocarEnemigo(donde, id_enemigo) {
   mapa[donde].enemigo = id_enemigo;
   document.getElementById("casilla"+donde).style.backgroundColor = "green";
   //está hecho para q los enemigos solo tengan 1 objeto; por lo tanto su defensa i ataque total es el mismo q el del objeto y punto
-  var creacionObjEnemigo = new enemigoObjetos(2,2,"media/images/obj3.png",);//ataque, defensa, xp, img
-  var creacionEnemigo = new initEnemigo(id_enemigo,2,2,5,"media/images/enemigo1.png", creacionObjEnemigo);//id,ataque, defensa, xp, img, obj
+  var creacionObjEnemigo = new enemigoObjetos(2,2,"media/images/obj2_opt.png",);//ataque, defensa, xp, img
+  var creacionEnemigo = new initEnemigo(20,id_enemigo,2,2,5,"media/images/enemigo1.png", creacionObjEnemigo);//vidas,id,ataque, defensa, xp, img, obj
   enemigo.push(creacionEnemigo); 
 
 
@@ -715,7 +1205,7 @@ function colocarObj(donde, tipo){
   
   }
 }
-/* Guille: Método que se encarga de barrer tanto filas como columnas y pintar la oscuridad i decir si se encuentra objecto*/
+/* Método que se encarga de barrer tanto filas como columnas y pintar la oscuridad i decir si se encuentra objecto*/
 /* tipo: fila o columna */ 
 function pintarMinimapa(inicio, fin, tipo, actual) {
   if(tipo == "columna") {
@@ -761,16 +1251,17 @@ function guardarPartida() {
          var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1";
          player.pGuardadas++;
          httpPostRequest(url,JSON.stringify(player));
-          console.log("PARTIDA GUARDADA");
+          console.log("PARTIDA GUARDADA en slot 1");
         } else {
           var url = "http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2";
           player.pGuardadas++;
           httpPostRequest(url,JSON.stringify(player));
-          console.log("PARTIDA GUARDADA");
+          console.log("PARTIDA GUARDADA en slot 2");
         }
         
         break;
-      case 2: 
+      case 2:
+        //ya estan llenos los dos slots 
         var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
         var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
         var ok = false;

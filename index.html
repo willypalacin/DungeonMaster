@@ -56,8 +56,8 @@
             <span class="close">&times;</span><!--añado cruz para cerrar popup-->
             <h4>YOUR OBJECTS</h4>
             <div class="mochila_obj">
-                <img src="media/images/obj1.png"  height="65" width="65" id="obj1n2" onclick="object_clicked(1);">
-                <img src="media/images/obj2_opt.png"  height="65" width="65" id="obj2n2" onclick="object_clicked(2);">
+                <img src="media/images/martell1.png"  height="65" width="65" id="obj1n2" onclick="object_clicked(1);">
+                <img src="media/images/espasa_or.png"  height="65" width="65" id="obj2n2" onclick="object_clicked(2);">
             </div>
             <div>
               <button type="button" onclick = "CogerObjMano(1)"class="button_coger">COGER CON MANO DERECHA</button>
@@ -66,13 +66,13 @@
             </div>
             <div>
               <h4>MANO DERECHA</h4>
-              <img src="media/images/obj1.png"  height="40" width="40" id="cogido_derecha_1">
-              <img src="media/images/obj2_opt.png"  height="40" width="40" id="cogido_derecha_2">
+              <img src="media/images/martell1.png"  height="40" width="40" id="cogido_derecha_1">
+              <img src="media/images/espasa_or.png"  height="40" width="40" id="cogido_derecha_2">
             </div>
             <div>
               <h4>MANO IZQUIERDA</h4>
-              <img src="media/images/obj1.png"  height="40" width="40" id="cogido_izq_1">
-              <img src="media/images/obj2_opt.png"  height="40" width="40" id="cogido_izq_2">
+              <img src="media/images/martell1.png"  height="40" width="40" id="cogido_izq_1">
+              <img src="media/images/espasa_or.png"  height="40" width="40" id="cogido_izq_2">
             </div>
 
           </div>
@@ -87,31 +87,39 @@
             <div class="flex_lucha">
               <div class="img_enemigo">
               <h4>ENEMIGO</h4>
-              <img src="media/images/enemigo1.png"  height="80" width="60" id="img_enemigo1n2">
-              <img src="media/images/enemigo2.png"  height="80" width="60" id="img_enemigo2n2">
+              <img src="media/images/e1.png"  height="80" width="60" id="img_enemigo1n2">
+              <img src="media/images/e2.png"  height="80" width="60" id="img_enemigo2n2">
               <p id="enemigo_defensa">DEFENSA:</p>
               <p id="enemigo_ataque">ATAQUE:</p>
+              <p id="enemigo_vidas">VIDAS: 5</p> <!--LOS ENEMIGOS SIEMPRE PARTEN DE 5 VIDAS-->
+
+
             </div>
             <div class="flex_botton_huir_luchar">
-                <button type="button" onclick = "huir()"class="button_luchar_huir">HUIR</button>
-                <button type="button" onclick = "luchar()"class="button_luchar_huir">LUCHAR</button>
+                <button type="button" onclick = "huir()"id ="huir" class="button_luchar_huir">HUIR</button>
+                <button type="button" onclick = "luchar()"id ="luchar"class="button_luchar_huir">LUCHAR</button>
             </div>
             <div class="objetos_mano">
               <div class="right">
                 <p id="lucha_mano_derecha">MANO DERECHA:</p>
-                <img src="media/images/obj1.png"  height="80" width="60" id="img_mano_derecha1">
-                <img src="media/images/obj2_opt.png"  height="80" width="60" id="img_mano_derecha2">
+                <img src="media/images/martell1.png"  height="80" width="60" id="img_mano_derecha1">
+                <img src="media/images/espasa_or.png"  height="80" width="60" id="img_mano_derecha2">
                 <img src="media/images/obj3.png"  height="80" width="60" id="img_mano_derecha3">
                 <p id="player_defensa_derecha">Defensa: </p>
                 <p id="player_ataque_derecha">Ataque: </p>
               </div>
               <div class="left">
                   <p id="lucha_mano_left">MANO IZQUIERDA:</p>
-                  <img src="media/images/obj1.png"  height="80" width="60" id="img_mano_left1">
-                  <img src="media/images/obj2_opt.png"  height="80" width="60" id="img_mano_left2">
+                  <img src="media/images/martell1.png"  height="80" width="60" id="img_mano_left1">
+                  <img src="media/images/espasa_or.png"  height="80" width="60" id="img_mano_left2">
                   <img src="media/images/obj3.png"  height="80" width="60" id="img_mano_left3">
                   <p id="player_defensa_izq">Defensa: </p>
                   <p id="player_ataque_izq">Ataque: </p>
+                </div>
+                <div>
+                  <p id="total_defensa_player">DEFENSA TOTAL: 2</p>
+                  <p id="total_ataque_player">ATAQUE TOTAL: 2</p>
+                  <p id="player_vidas">VIDAS: 10</p>
                 </div>
                 
             </div>
@@ -121,7 +129,15 @@
       
       <section id="equipocarac" class="equipocarac">
           <h2>Equipo & Caracterí­sticas</h2>
-          <h3>Nombre/Sexo: <span id = "nombre"></span></h3>
+          <h3>Nombre: <span id = "nombre"></span></h3>
+          <div class="sexo">
+            <h3>Sexo: <span id = "sexo"></span></h3>
+            <img src="media/images/dona.png" id="donaimg" alt="dona" height="65" width="65" >
+            <img src="media/images/home.png" id="homaimg" alt="home" height="65" width="65" >
+
+
+
+          </div>
           <h3>Nivel: <span id = "nivel"></span></h3>
           <h3>Ataque: <span id = "ataque"></span></h3>
           <h3>Defensa: <span id = "defensa"></span></h3>
