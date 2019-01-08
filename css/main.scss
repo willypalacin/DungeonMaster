@@ -7,9 +7,6 @@ $color_black: black;
 $fuente: Arial;
 
 
-body{
-    background-image: url(/media/images/dungeon_step.png);
-  }
   h1{
     text-align:center;
     color:$color_blak;
@@ -261,7 +258,7 @@ body{
     font-weight: bold;
   }
   
-  .close:hover,
+  .close:hover
   .close:focus {
     color: $color_blak;
     text-decoration: none;

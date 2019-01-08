@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="p4_final" content="Dungeon Master AJAX Game" />
     <meta name="keywords" content="dungeon, ajax, javascript, css" />
-    <meta name="blanca.marin & guillermo.palacin" content="Blanca & Guille" />
+    <meta name="blanca.marin, guillermo.palacin, Oriol Lalaguna" content="Blanca  Guille Oriol" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/main.css" type="text/css" media="all" />
    
@@ -44,7 +44,7 @@
     </div>
 
     <section id="navegacion" class="navegacion">
-        <h2>Navegación</h2>
+        <h2>Navegacion</h2>
         <canvas id="visor" onclick = "clickVisor()"class="visor" width="512" height="512"></canvas>
     </section>
 
@@ -54,7 +54,7 @@
         <div id="myModal" class="modal">
           <div class="modal-obj">
             <span class="close">&times;</span><!--añado cruz para cerrar popup-->
-            <h4>YOUR OBJECTS</h4>
+            <h4>YOUR OBJECTS, primero pulsa sobre el objeto y selecciona la mano</h4>
             <div class="mochila_obj">
                 <img src="media/images/martell1.png"  height="65" width="65" id="obj1n2" onclick="object_clicked(1);">
                 <img src="media/images/espasa_or.png"  height="65" width="65" id="obj2n2" onclick="object_clicked(2);">
@@ -128,7 +128,7 @@
       </div>
       
       <section id="equipocarac" class="equipocarac">
-          <h2>Equipo & Caracterí­sticas</h2>
+          <h2>Equipo & Caracteristicas</h2>
           <h3>Nombre: <span id = "nombre"></span></h3>
           <div class="sexo">
             <h3>Sexo: <span id = "sexo"></span></h3>
@@ -141,8 +141,13 @@
           <h3>Nivel: <span id = "nivel"></span></h3>
           <h3>Ataque: <span id = "ataque"></span></h3>
           <h3>Defensa: <span id = "defensa"></span></h3>
+          <h3>XP: <span id = "xp"></span></h3>
           <h3>Vida: <span id = "vida"></span></h3>
-          <h3>Objetos: <span id = "objetos"></span></h3>
+          <div class = "objeto">
+          <h3>Objetos: <span id = "objetos"></span> </h3>
+            <img src="media/images/martell1.png" id="martilloImg" alt="dona">
+            <img src="media/images/espasa_or.png" id="espadaImg" alt="home"  >
+          </div>
         </section>
   
   

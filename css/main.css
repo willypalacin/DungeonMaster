@@ -1,6 +1,6 @@
 @charset "UTF-8";
 body {
-  background-image: url(/media/images/dungeon_step.png);
+  background: linear-gradient(135deg, rgba(9,129,240,1) 0%, rgba(17,245,234,0.1) 100%);
 }
 
 h1 {
@@ -78,6 +78,19 @@ p {
   font-size: 1.2em;
   margin: 30px 65px;
   border-radius: 8px;
+}
+
+
+#martilloImg {
+  opacity: 0;
+  height: 65px;
+  width: 65px;
+}
+
+#espadaImg {
+  opacity: 0;
+  height: 65px;
+  width: 65px;
 }
 
 .button_luchar_huir {
@@ -203,6 +216,13 @@ p {
       flex-wrap: wrap;
   height: 290px;
   width: 290px;
+}
+
+#homaimg{
+  opacity: 0;
+}
+#donaimg{
+opacity: 0;
 }
 
 /*POPUP al clicar sobre visor, cuando hay obj o enemigo*/

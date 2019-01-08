@@ -1,3 +1,5 @@
+var contPart = 0;
+
 /*variable auxiliar
   selected --> indica que objeto de la mochila se ha pulsado: para posteriormente decidir si lo queremos en mano derecha o izq
   obj1_d... --> indica si el obj1 o 2 ya esta asigando a la derecha o a la izq (util para no asignarlo 2 veces, o dos objetos a una misma mano)
@@ -28,7 +30,7 @@ function enemigoObjetos(ataque, defensa, img){
   objectos--> array de tipo enemigoObjeto
 */
 function initEnemigo(vida, id, ataque, defensa, xpp, img, objetos){ //lleno player.mochila con objetosEncontrados
-  this.vida = vida;
+  this.vida = 5;
   this.id = id;
   this.ataque = ataque;
   this.defensa = defensa;
@@ -128,22 +130,63 @@ function comprobacionSexo(part) {
   
   return ok;
 }
+
+function inicializarJugador() {
+
+  player.vida = 10;
+  player.nivel= -2;
+   //Controla las partidas que tiene guardadas el Usuario. 
+  player.xp=6;//quan arribi a 10 passa a nivell -1
+  player.ataque=2;
+  player.defensa=2,
+  player.manoderecha=0;//emepzamos sin objectos (ni en las manos, ni en la mochila)
+  player.manoizquierda=0;
+  player.estadoPartida.x = 0;
+  player.estadoPartida.y = 9; //ASSIGNACION VALORES INICIALES 
+  player.estadoPartida.nivel=-2;
+  player.estadoPartida.direccion=1;  /* 0 Norte, 1 Este, 2 Sur, 3 Oeste*/
+
+
+}
+
 function comenzarPartida() {//button COMENZAR PARTIDA
-  var part = prompt("indique un nombre a la partida", "Introduzca el nombre de la partida");
-  player.nombre = part;
-  var good = 0;
-  do{
-    part = prompt("Indique de que sexo es su personage: mujer o hombre", "mujer o hombre");
-    good = comprobacionSexo(part);
-  }while(good = 1)
- 
-  inicializarMiniMapa();//y lleno mapa[]
-  pintarCasillaActual();
-  eliminarCasillaActual();
-  pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
-  playerModelToScreen();
+  if(contPart == 0){
+    var part = prompt("indique un nombre a la partida", "Introduzca el nombre de la partida");
+    player.nombre = part;
+   var good = 0;
+    do{
+     part = prompt("Indique de que sexo es su personage: mujer o hombre", "mujer o hombre");
+     good = comprobacionSexo(part);
+   }while(good = 0);
+
+    inicializarJugador();
+    inicializarMiniMapa();//y lleno mapa[]
+    pintarCasillaActual();
+    eliminarCasillaActual();
+    pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+    playerModelToScreen();
+}
+else {
+    var part = prompt("indique un nombre a la partida", "Introduzca el nombre de la partida");
+    player.nombre = part;
+   var good = 0;
+    do{
+     part = prompt("Indique de que sexo es su personage: mujer o hombre", "mujer o hombre");
+     good = comprobacionSexo(part);
+   }while(good = 0);
+    eliminarCasillaActual();
+    
+    inicializarJugador();
+    inicializarMiniMapa();//y lleno mapa[]
+    pintarCasillaActual();
+    eliminarCasillaActual();
+    pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+    playerModelToScreen();
+}
+contPart++;
   
 }
+
 
 
 
@@ -325,6 +368,7 @@ function clickVisor(){
         
         }
         modal.style.display = "block";
+        playerModelToScreen();
       }
     
 
@@ -332,6 +376,7 @@ function clickVisor(){
       if(localizarCasilla(player.estadoPartida.x, player.estadoPartida.y-1).enemigo!=0){
         switch (localizarCasilla(player.estadoPartida.x, player.estadoPartida.y-1).enemigo) {
           case 1://enemigo1 --> michy
+
             var defensa = defensaEnemigo(1);
             var ataque = ataqueEnemigo(1);
             document.getElementById("img_enemigo1n2").style.opacity= 1; 
@@ -340,8 +385,8 @@ function clickVisor(){
 
 
            document.getElementById("enemigo_defensa").innerHTML = "DEFENSA:  "+defensa;   
-            document.getElementById("enemigo_ataque").innerHTML = "ATAQUE:  "+ataque;    
-            console.log(player.manoizquierda+"muajjajaj");
+            document.getElementById("enemigo_ataque").innerHTML = "ATAQUE:  "+ataque;  
+            document.getElementById("enemigo_vidas").innerHTML = "VIDAS:  "+enemigo[0].vida;     
             switch (player.manoderecha) {
               case 1:
               document.getElementById("player_defensa_derecha").innerHTML = "Defensa:  "+1;
@@ -602,6 +647,7 @@ function clickVisor(){
         
         
         modal_lucha.style.display = "block";
+        playerModelToScreen();
       }
     break;
 
@@ -708,6 +754,7 @@ function clickVisor(){
     
 
   }
+  playerModelToScreen();
   
 }
 
@@ -782,8 +829,11 @@ function actualizarObjPlayer(id_enemigo) {
 }
 //Se quitan 3 vidas al jugador cada vez q pulse huir
 function huir() {
-  alert("Has decido huir! Si no eres suficientemente fuerte... Ve y buscar objetos con los que atacar!"); 
+  alert("Has decido huir! Si no eres suficientemente fuerte... Ve y buscar objetos con los que atacar!. Pierdes 1 punto de XP"); 
+  player.xp  = player.xp -1;
   document.getElementById("luchar").style.opacity= 0;
+  document.getElementById("huir").style.opacity = 0;
+  playerModelToScreen();
 }
 
 
@@ -791,6 +841,7 @@ function huir() {
 
 //Bucle de lucha (peticiones a la API ataque), hasta que jugador o enemigo mueren o jugador pulsa boton HUIR
 function luchar(){
+  
   document.getElementById("luchar").style.opacity= 1;
   luchar_huir.turno_player = true;
   var quitar_atacado = 0;
@@ -803,9 +854,11 @@ function luchar(){
       defensa = defensaEnemigo(id_enemigo);
       theUrl = crearUrlLucha(player.ataque, defensa);//ataque player, defensa enemigo
       quitar_atacado = httpGetRequest(theUrl);
+      console.log(quitar_atacado + "quitaratacado");
       vidasEnemigo = cuantasVidasEnemigo(id_enemigo);
       console.log(vidasEnemigo+": vidas enemigo");
       vidas_defensa = vidasEnemigo - quitar_atacado;
+      console.log("vidas defensa"+vidas_defensa);
       document.getElementById("enemigo_vidas").innerHTML = "VIDAS: "+vidas_defensa;
       actualizaVidasDefensa(vidas_defensa, id_enemigo);
       if(vidas_defensa <= 0){
@@ -832,9 +885,34 @@ function luchar(){
         console.log(player.vida+"player.vida");
           
         if(vidas_defensa < 0){
-          alert("Player has muerto --> ahora willy se debe recuperar partida guardada o empezar una nueva!!!!");
-          document.getElementById("luchar").style.opacity= 0;
-         muerte = true;
+          var part = prompt("Player has muerto --> que desea hacer ¿Cargar Partida o Comenzar Partida?", "comenzar o cargar");
+          if (part.toLowerCase() == "cargar") cargarPartida();
+          else if (part.toLowerCase() == "comenzar"){ 
+            document.getElementById("luchar").style.opacity= 0;
+            muerte = true;
+            var creacionObjEnemigo = new enemigoObjetos(2,2,"media/images/obj2_opt.png",);//ataque, defensa, xp, img
+            var creacionEnemigo = new initEnemigo(5,id_enemigo,2,2,5,"media/images/enemigo1.png", creacionObjEnemigo);//vidas,id,ataque, defensa, xp, img, obj
+            enemigo[0] = creacionEnemigo;
+            comenzarPartida();
+            console.log("ENEMIGO VIDA: "+enemigo[0].vida);
+            console.log("PLAYER "+player.vida);
+            
+          }
+            else {
+              alert("la opcion introducida no corresponde con las opciones, comenzando partida...");
+              document.getElementById("luchar").style.opacity= 0;
+              muerte = true;
+              var creacionObjEnemigo = new enemigoObjetos(2,2,"media/images/obj2_opt.png",);//ataque, defensa, xp, img
+              var creacionEnemigo = new initEnemigo(5,id_enemigo,2,2,5,"media/images/enemigo1.png", creacionObjEnemigo);//vidas,id,ataque, defensa, xp, img, obj
+              enemigo[0] = creacionEnemigo;
+              
+              comenzarPartida();
+
+              //HAY QUE CERRAR EL PANELILLO
+            }
+
+          
+
         }else{
           
           luchar_huir.turno_player = true;
@@ -845,6 +923,7 @@ function luchar(){
     }
 
     }
+    playerModelToScreen();
   }
 //}
 /*Guille: Función que verifica, que se haya pulsado el teclado*/
@@ -888,18 +967,26 @@ function comprobarSubirNivel(x, y, dir) {
   if(player.nivel == -2 && dir == 1 && x == 8 && y == 0 && puntos >= 20 ) {
     player.nivel = -1;
     ok = 1;
+    eliminarCasillaActual();
 
-  } else if(player.nivel == -2 && dir == 0 && x == 9 && y == 1 && puntos >= 49) {
+  } else if(player.nivel == -2 && dir == 0 && x == 9 && y == 1 && puntos >= 20) {
     player.nivel = -1;
     ok = 1;
+    eliminarCasillaActual();
+  } else if(player.nivel == -1 && dir == 0 && x == 9 && y == 1 && puntos >= 49){
+    alert("ENHORABUENA, HAS GANADO EL JUEGO");
+  } else if(player.nivel == -1 && dir == 1 && x == 8 && y == 0 && puntos >= 49){
+    alert("ENHORABUENA, HAS GANADO EL JUEGO");
   }
 
   if(ok == 1) {
     player.estadoPartida.x = 0;
     player.estadoPartida.y = 9;
+    
     inicializarMiniMapa();//y lleno mapa[]
     pintarCasillaActual();
     eliminarCasillaActual();
+    
     pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
     playerModelToScreen();
 
@@ -1094,7 +1181,7 @@ function mapaToImg(x, y) {
 }
 /*Guille: Método que se encarga de pintar minimapa*/
 function inicializarMiniMapa() {
-  if(player.nivel==-2) {
+  if(player.nivel==-2&&contPart==0) {
     var minimapaDOM = document.getElementById("mapacanvas");
   /* Crea dinámicamente las casillas del minimapa */
     for (var i = 0; i<10; i++) {
@@ -1131,7 +1218,7 @@ function inicializarMiniMapa() {
     colocarObj("61",2);
     colocarEnemigo("82",1);
   }
-  else if(player.nivel == -1) {
+  else if(player.nivel == -1 ) {
     var minimapaDOM = document.getElementById("mapacanvas")
     for (var i = 0; i<100; i++) {
       
@@ -1187,7 +1274,7 @@ function colocarEnemigo(donde, id_enemigo) {
   document.getElementById("casilla"+donde).style.backgroundColor = "green";
   //está hecho para q los enemigos solo tengan 1 objeto; por lo tanto su defensa i ataque total es el mismo q el del objeto y punto
   var creacionObjEnemigo = new enemigoObjetos(2,2,"media/images/obj2_opt.png",);//ataque, defensa, xp, img
-  var creacionEnemigo = new initEnemigo(20,id_enemigo,2,2,5,"media/images/enemigo1.png", creacionObjEnemigo);//vidas,id,ataque, defensa, xp, img, obj
+  var creacionEnemigo = new initEnemigo(5,id_enemigo,2,2,5,"media/images/enemigo1.png", creacionObjEnemigo);//vidas,id,ataque, defensa, xp, img, obj
   enemigo.push(creacionEnemigo); 
 
 
@@ -1275,6 +1362,15 @@ function guardarPartida() {
     }
 }
 function cargarPartida() {
+  if(contPart==0){
+    inicializarMiniMapa();//y lleno mapa[]
+    
+    
+    contPart++;
+  } else {eliminarCasillaActual();}
+    
+  
+ 
   var partidasGuardadas = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8"));
   console.log(partidasGuardadas.length);
   if(partidasGuardadas.length == 2) { 
@@ -1282,21 +1378,28 @@ function cargarPartida() {
     var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
     var part = prompt("Actualmente existen 2 partidas guardadas, seleccione cual quiere iniciar " + p1.nombre + " o " + p2.nombre ,"Introduzca el nombre de la partida");
     comprobacionPartida(part, p1, p2);
+    //pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+    
     playerModelToScreen();
   } else {
     if(partidasGuardadas[0] == "2"){
       var p2 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=2"));
       alert("Actualmente solo existe 1 partidas guardada, recuperando  partida: " + p2.nombre);
       player = p2;
+      //pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+      
       playerModelToScreen();
      } else {
       var p1 = JSON.parse(httpGetRequest("http://puigpedros.salleurl.edu/pwi/pac4/partida.php?token=6203a748-e182-4276-a910-9f00d83ff3e8&slot=1"));
       alert("Actualmente solo existe 1 partidas guardada, recuperando  partida: " + p1.nombre);
       player = p1;
+      //pintaPosicion(player.estadoPartida.x, player.estadoPartida.y);
+      
       playerModelToScreen();
      }
 
   }
+  
 }
 
 function comprobacionNombre(part, p1, p2) {
@@ -1350,8 +1453,10 @@ function eliminarPartida() {
 function comprobacionPartida(part, p1, p2) {
   if(part == p1.nombre) {
     player = p1;
+    pintarCasillaActual();
   } else if(part == p2.nombre) {
     player = p2;
+    pintarCasillaActual();
   } else {
     alert("La partida introducida no es correcta")
   }
@@ -1363,7 +1468,18 @@ function playerModelToScreen(){
   document.getElementById("nivel").innerHTML = player.nivel;
   document.getElementById("ataque").innerHTML = player.ataque;
   document.getElementById("defensa").innerHTML = player.defensa;
+  document.getElementById("xp").innerHTML = player.xp;
   document.getElementById("vida").innerHTML = player.vida;
+  for(var i = 0; i<player.mochila.length; i++) {
+    if(player.mochila[i].obj == 1) {
+      document.getElementById("martilloImg").style.opacity = 1;
+    }
+    if(player.mochila[i].obj == 2) {
+      document.getElementById("espadaImg").style.opacity = 1;
+    }
+    console.log("PLAYER, MOCHILA   "+player.mochila[i].obj)
+
+  }
 }
   
 
